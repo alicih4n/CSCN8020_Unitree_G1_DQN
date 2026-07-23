@@ -5,7 +5,7 @@
 **Course:** CSCN8020 - Reinforcement Learning  
 **Instructor:** Prof. Enrique Espinosa  
 **Institution:** Conestoga College, Ontario, Canada  
-**Repository:** [https://github.com/alicih4n/CSCN8020_Unitree_G1_DQN](https://github.com/alicih4n/CSCN8020_Unitree_G1_DQN)
+**Repository:** [https://github.com/alicih4n/CSCN8020_Unitree_G1_DQN.git](https://github.com/alicih4n/CSCN8020_Unitree_G1_DQN.git)
 
 ---
 
