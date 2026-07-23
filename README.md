@@ -5,7 +5,7 @@ robot using MuJoCo and Gymnasium. It covers model inspection, fixed-base model
 generation, single-joint PD control, bias-force compensation, CSV logging, and
 a custom Gymnasium environment with deterministic rule-based validation.
 
-The workshop intentionally stops before implementation of a DQN agent.
+---
 
 ## Project Overview
 
@@ -24,8 +24,7 @@ The workshop begins with environment preparation and model inspection, then prog
 9. Construction of a custom Gymnasium environment
 10. Rule-based environment validation
 11. Optional interactive visualization before reinforcement learning
-
-The project intentionally stops before the student-written Deep Q-Network implementation. The validated Gymnasium environment is designed to become the foundation for that next phase.
+12. Deep Q-Network (DQN) policy training, parameter study, and evaluation
 
 ---
 
@@ -40,8 +39,6 @@ The workshop is intended for college-level students studying:
 - Control systems
 - Artificial intelligence
 - Python programming
-
-The material emphasizes conceptual understanding and reproducibility rather than only presenting finished code.
 
 Students are expected to understand the relationship between:
 
@@ -59,9 +56,7 @@ Actuator torque
 Simulated physical movement
 ```
 
-The workshop separates conventional low-level control from high-level reinforcement-learning decisions.
-
-This allows students to focus on the reinforcement-learning problem without first needing to solve full humanoid balance, locomotion, inverse kinematics, and whole-body torque control.
+The workshop separates conventional low-level control from high-level reinforcement-learning decisions. This allows students to focus on the reinforcement-learning problem without first needing to solve full humanoid balance, locomotion, inverse kinematics, and whole-body torque control.
 
 ---
 
@@ -85,7 +80,8 @@ After completing the workshop, students should be able to:
 14. Define observations, actions, rewards, and success conditions.
 15. Validate an environment with a rule-based policy.
 16. Confirm deterministic simulation behaviour.
-17. Prepare the environment for a future student-written DQN agent.
+17. Train a DQN agent using PyTorch to solve the multi-goal control problem.
+18. Compare the learned policy to the rule-based baseline and perform hyperparameter tuning.
 
 ---
 
@@ -94,6 +90,7 @@ After completing the workshop, students should be able to:
 | Milestone | Status |
 |---|---|
 | WSL 2 and Ubuntu setup | Complete |
+| macOS M1 Native Setup | Complete |
 | MuJoCo installation | Complete |
 | MuJoCo viewer test | Complete |
 | Unitree G1 repository integration | Complete |
@@ -110,57 +107,66 @@ After completing the workshop, students should be able to:
 | Five-run determinism test | Complete |
 | Optional rendered validation | Complete |
 | Interactive camera-preparation demo | Complete |
-| Student-written DQN | Not started |
+| Student-written DQN | Complete |
 | Physical G1 deployment | Future work |
 
 ---
 
 ## Requirements
 
-- Windows 11 with WSL 2
-- Ubuntu 24.04
-- Python 3.12
-- WSLg for optional graphical demonstrations
+- macOS (Apple Silicon native) or Windows 11 with WSL 2 (Ubuntu 24.04)
+- Python 3.12 or 3.13
+- PyTorch (with MPS support for Apple Silicon GPU acceleration)
 
 ## Setup
 
-Run these commands from the repository root in WSL Ubuntu:
+Run these commands from the repository root:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
-The workshop also uses the official Unitree MuJoCo repository as an external
-dependency:
+The workshop also uses the official Unitree MuJoCo repository as an external dependency:
 
 ```bash
 git clone https://github.com/unitreerobotics/unitree_mujoco.git external/unitree_mujoco
-git -C external/unitree_mujoco checkout ae6a8403e272733e9996ef59990880330496177f
 ```
 
-## Workshop
-
-Open `Unitree_MuJoCo_G1_Primer_Workshop.ipynb` and follow its sections in
-order. Runtime source is under `src/`, and the course-owned fixed-base model is
-under `assets/g1_fixed_base/`.
-
-## Headless validation
-
+Ensure you run the fixed-base model generator once:
 ```bash
-source .venv/bin/activate
-python -m compileall src
-python src/inspect_g1_model.py \
-  assets/g1_fixed_base/scene_29dof_fixed_base.xml \
-  --no-viewer
-python src/control_single_joint.py \
-  --scene assets/g1_fixed_base/scene_29dof_fixed_base.xml \
-  --target -0.8 \
-  --duration 2 \
-  --no-viewer
-PYTHONPATH=src python src/test_g1_elbow_env.py
+python src/create_fixed_base_g1.py
 ```
 
-Headless execution is authoritative. Rendered demonstrations are optional and
-require WSLg.
+---
+
+## Deep Q-Network (DQN) Control
+
+The DQN implementation is located in the `src/dqn/` package. It contains a PyTorch-based Q-Network, Replay Buffer, and DQNAgent, as well as scripts for training, evaluation, and rendering.
+
+### 1. Training the Agent
+To train the agent on both Configuration A (decay = 0.995) and Configuration B (decay = 0.985):
+```bash
+PYTHONPATH=src python src/dqn/train_dqn.py
+```
+This script runs training headlessly and logs metrics to `results/config_a/` and `results/config_b/`. Checkpoints are saved under `models/`.
+
+### 2. Evaluating the Policy
+To run greedy evaluation ($\epsilon = 0.0$) of both configurations and the rule-based policy over the 20 benchmark episodes:
+```bash
+PYTHONPATH=src python src/dqn/evaluate_dqn.py
+```
+This generates comparison tables in the terminal, saves metrics CSV logs, and copies the best-performing model to `models/selected_dqn.pt`.
+
+### 3. Rendering and Recording Video
+To visually demonstrate the trained DQN policy:
+* **macOS (Mac M1/M2/M3):**
+  ```bash
+  PYTHONPATH=src mjpython src/dqn/render_dqn_policy.py
+  ```
+* **Linux / WSL:**
+  ```bash
+  PYTHONPATH=src python src/dqn/render_dqn_policy.py
+  ```
+*(When the window opens, follow the instructions in the terminal to press Enter and begin control).*
