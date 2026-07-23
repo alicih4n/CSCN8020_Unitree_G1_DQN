@@ -1,9 +1,24 @@
-# Unitree MuJoCo G1 Primer Workshop
+# Deep Q-Network Control of the Unitree G1 Left Elbow
 
-This beginner-friendly workshop introduces control of a Unitree G1 humanoid
-robot using MuJoCo and Gymnasium. It covers model inspection, fixed-base model
-generation, single-joint PD control, bias-force compensation, CSV logging, and
-a custom Gymnasium environment with deterministic rule-based validation.
+**Developer / Student Name:** Ali Cihan Ozdemir  
+**Student ID:** 9091405  
+**Course:** CSCN8020 - Reinforcement Learning  
+**Instructor:** Prof. Enrique Espinosa  
+**Institution:** Conestoga College, Ontario, Canada  
+**Repository:** [https://github.com/alicih4n/CSCN8020_Unitree_G1_DQN](https://github.com/alicih4n/CSCN8020_Unitree_G1_DQN)
+
+---
+
+### Project Purpose & Objective
+
+The primary objective of this project is to build and train a **student-written PyTorch Deep Q-Network (DQN)** agent to control the left elbow joint (`left_elbow_joint`) of the **Unitree G1 humanoid robot** in a physics simulation environment (MuJoCo and Gymnasium). 
+
+Rather than relying on hand-crafted rules or turnkey libraries (such as Stable-Baselines3), this project implements every reinforcement learning component from scratch:
+- **Neural Q-Network (`QNetwork`)**: A 4-input observation to 3-output action-value estimate architecture with Kaiming Normal weight initialization.
+- **Experience Replay Buffer (`ReplayBuffer`)**: A 50,000-transition circular memory buffer for off-policy mini-batch sampling.
+- **Target Network & Bellman Target Optimization**: Online and target Q-networks synchronized every 250 steps, utilizing Huber loss and gradient clipping.
+- **Parameter Study**: Controlled comparison between **Configuration A** ($\text{epsilon decay} = 0.995$) and **Configuration B** ($\text{epsilon decay} = 0.985$).
+- **Benchmark Evaluation**: Greedy policy evaluation ($\epsilon = 0.0$) across 20 benchmark episodes (`-0.8, -0.4, +0.4, +0.8` rad target angles), proving a 100% success rate and outperforming the rule-based baseline.
 
 ---
 
@@ -163,10 +178,10 @@ This generates comparison tables in the terminal, saves metrics CSV logs, and co
 To visually demonstrate the trained DQN policy:
 * **macOS (Mac M1/M2/M3):**
   ```bash
-  PYTHONPATH=src mjpython src/dqn/render_dqn_policy.py
+  PYTHONPATH=src mjpython src/dqn/render_dqn_continuous.py
   ```
 * **Linux / WSL:**
   ```bash
-  PYTHONPATH=src python src/dqn/render_dqn_policy.py
+  PYTHONPATH=src python src/dqn/render_dqn_continuous.py
   ```
-*(When the window opens, follow the instructions in the terminal to press Enter and begin control).*
+*(When the window opens, the robot will automatically alternate between goal targets in 3D MuJoCo).*
