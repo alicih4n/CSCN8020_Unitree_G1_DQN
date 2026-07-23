@@ -1,187 +1,137 @@
 # Deep Q-Network Control of the Unitree G1 Left Elbow
 
-**Developer / Student Name:** Ali Cihan Ozdemir  
+**Student Full Name:** Ali Cihan Ozdemir  
 **Student ID:** 9091405  
 **Course:** CSCN8020 - Reinforcement Learning  
+**Assignment:** Deep Q-Network (DQN) Control of the Unitree G1 Left Elbow (Assignment 3)  
 **Instructor:** Prof. Enrique Espinosa  
 **Institution:** Conestoga College, Ontario, Canada  
-**Repository:** [https://github.com/alicih4n/CSCN8020_Unitree_G1_DQN.git](https://github.com/alicih4n/CSCN8020_Unitree_G1_DQN.git)
+**GitHub Repository URL:** [https://github.com/alicih4n/CSCN8020_Assignment3](https://github.com/alicih4n/CSCN8020_Assignment3)  
+**Cloneable .git URL:** `https://github.com/alicih4n/CSCN8020_Assignment3.git`  
+**Operating Environment:** macOS (Apple Silicon M1) | Python 3.13 | PyTorch 2.10.0 with MPS GPU acceleration
 
 ---
 
-### Project Purpose & Objective
+## 1. Short Project Summary
 
-The primary objective of this project is to build and train a **student-written PyTorch Deep Q-Network (DQN)** agent to control the left elbow joint (`left_elbow_joint`) of the **Unitree G1 humanoid robot** in a physics simulation environment (MuJoCo and Gymnasium). 
-
-Rather than relying on hand-crafted rules or turnkey libraries (such as Stable-Baselines3), this project implements every reinforcement learning component from scratch:
-- **Neural Q-Network (`QNetwork`)**: A 4-input observation to 3-output action-value estimate architecture with Kaiming Normal weight initialization.
-- **Experience Replay Buffer (`ReplayBuffer`)**: A 50,000-transition circular memory buffer for off-policy mini-batch sampling.
-- **Target Network & Bellman Target Optimization**: Online and target Q-networks synchronized every 250 steps, utilizing Huber loss and gradient clipping.
-- **Parameter Study**: Controlled comparison between **Configuration A** ($\text{epsilon decay} = 0.995$) and **Configuration B** ($\text{epsilon decay} = 0.985$).
-- **Benchmark Evaluation**: Greedy policy evaluation ($\epsilon = 0.0$) across 20 benchmark episodes (`-0.8, -0.4, +0.4, +0.8` rad target angles), proving a 100% success rate and outperforming the rule-based baseline.
+This project implements a complete, student-written PyTorch Deep Q-Network (DQN) agent to control the left elbow joint (`left_elbow_joint`) of the fixed-base Unitree G1 humanoid robot in MuJoCo and Gymnasium. Rather than relying on turnkey libraries like Stable-Baselines3, all core RL components—Q-Network, Replay Buffer, epsilon-greedy action selection, target network synchronization, Huber loss TD optimization, and greedy evaluation—were implemented from scratch. The agent underwent a controlled parameter study on exploration decay ($\text{decay}=0.995$ vs $0.985$) and achieved a **100% success rate (20/20 episodes)** across four benchmark goals (`-0.8, -0.4, +0.4, +0.8` rad), outperforming the rule-based baseline in step speed (**19.8 steps** vs 24.0) and goal precision (**0.0039 rad** vs 0.0122 rad error).
 
 ---
 
-## Project Overview
+## 2. Environment & Dependency Setup
 
-This project develops a reproducible instructional workflow for working with the Unitree G1 humanoid robot in MuJoCo.
-
-The workshop begins with environment preparation and model inspection, then progresses through:
-
-1. MuJoCo installation and viewer validation
-2. Unitree G1 model inspection
-3. Joint, actuator, sensor, `qpos`, and `qvel` analysis
-4. Single-joint proportional-derivative control
-5. Whole-body joint stabilization
-6. Gravity and bias-force compensation
-7. Creation of a course-owned fixed-base G1 model
-8. CSV logging and deterministic validation
-9. Construction of a custom Gymnasium environment
-10. Rule-based environment validation
-11. Optional interactive visualization before reinforcement learning
-12. Deep Q-Network (DQN) policy training, parameter study, and evaluation
-
----
-
-## Educational Purpose
-
-The workshop is intended for college-level students studying:
-
-- Reinforcement learning
-- Robotics
-- Machine learning
-- Simulation
-- Control systems
-- Artificial intelligence
-- Python programming
-
-Students are expected to understand the relationship between:
-
-```text
-High-level discrete action
-        ↓
-Internal joint-position target
-        ↓
-PD controller
-        ↓
-Bias-force compensation
-        ↓
-Actuator torque
-        ↓
-Simulated physical movement
-```
-
-The workshop separates conventional low-level control from high-level reinforcement-learning decisions. This allows students to focus on the reinforcement-learning problem without first needing to solve full humanoid balance, locomotion, inverse kinematics, and whole-body torque control.
-
----
-
-## Learning Outcomes
-
-After completing the workshop, students should be able to:
-
-1. Explain the role of MuJoCo in robot simulation.
-2. Distinguish between bodies, joints, actuators, sensors, and degrees of freedom.
-3. Explain the purpose of `qpos` and `qvel`.
-4. Load and inspect the Unitree G1 29-DOF model.
-5. Identify a joint and actuator by name.
-6. Read joint position and velocity data.
-7. Apply bounded actuator torque.
-8. Implement a proportional-derivative controller.
-9. Explain the effect of gravity and bias forces.
-10. Create a fixed-base instructional robot model.
-11. Record simulation results in CSV format.
-12. Build a Gymnasium-compatible environment.
-13. Explain the difference between `terminated` and `truncated`.
-14. Define observations, actions, rewards, and success conditions.
-15. Validate an environment with a rule-based policy.
-16. Confirm deterministic simulation behaviour.
-17. Train a DQN agent using PyTorch to solve the multi-goal control problem.
-18. Compare the learned policy to the rule-based baseline and perform hyperparameter tuning.
-
----
-
-## Current Project Status
-
-| Milestone | Status |
-|---|---|
-| WSL 2 and Ubuntu setup | Complete |
-| macOS M1 Native Setup | Complete |
-| MuJoCo installation | Complete |
-| MuJoCo viewer test | Complete |
-| Unitree G1 repository integration | Complete |
-| G1 model inspection | Complete |
-| Fixed-base G1 generation | Complete |
-| Left-elbow PD control | Complete |
-| Whole-body joint stabilization | Complete |
-| Bias-force compensation | Complete |
-| CSV logging | Complete |
-| Deterministic controller validation | Complete |
-| Gymnasium environment | Complete |
-| Gymnasium environment checker | Complete |
-| Rule-based validation policy | Complete |
-| Five-run determinism test | Complete |
-| Optional rendered validation | Complete |
-| Interactive camera-preparation demo | Complete |
-| Student-written DQN | Complete |
-| Physical G1 deployment | Future work |
-
----
-
-## Requirements
-
-- macOS (Apple Silicon native) or Windows 11 with WSL 2 (Ubuntu 24.04)
-- Python 3.12 or 3.13
-- PyTorch (with MPS support for Apple Silicon GPU acceleration)
-
-## Setup
-
-Run these commands from the repository root:
-
+### Step 1: Create and Activate Virtual Environment
 ```bash
+# Clone repository
+git clone https://github.com/alicih4n/CSCN8020_Assignment3.git
+cd CSCN8020_Assignment3
+
+# Create and activate virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
+```
+
+### Step 2: Install Required Dependencies
+```bash
 pip install -r requirements.txt
 ```
 
-The workshop also uses the official Unitree MuJoCo repository as an external dependency:
-
+### Step 3: Fetch External Unitree Assets & Generate Fixed-Base Model
 ```bash
+# Fetch external Unitree MuJoCo models
 git clone https://github.com/unitreerobotics/unitree_mujoco.git external/unitree_mujoco
-```
 
-Ensure you run the fixed-base model generator once:
-```bash
+# Generate fixed-base G1 XML scene assets
 python src/create_fixed_base_g1.py
 ```
 
 ---
 
-## Deep Q-Network (DQN) Control
+## 3. Execution Commands
 
-The DQN implementation is located in the `src/dqn/` package. It contains a PyTorch-based Q-Network, Replay Buffer, and DQNAgent, as well as scripts for training, evaluation, and rendering.
+### Run the Jupyter Notebook
+```bash
+jupyter notebook Unitree_MuJoCo_G1_Primer_Workshop.ipynb
+```
 
-### 1. Training the Agent
-To train the agent on both Configuration A (decay = 0.995) and Configuration B (decay = 0.985):
+### Run Self-Validation Smoke Test
+```bash
+PYTHONPATH=src python src/dqn/smoke_test.py
+```
+
+### Train the DQN Policy (Headless Parameter Study)
 ```bash
 PYTHONPATH=src python src/dqn/train_dqn.py
 ```
-This script runs training headlessly and logs metrics to `results/config_a/` and `results/config_b/`. Checkpoints are saved under `models/`.
+*Trains Configuration A (decay=0.995) and Configuration B (decay=0.985) for 600 episodes headlessly, saving checkpoints to `models/` and logging plots to `results/`.*
 
-### 2. Evaluating the Policy
-To run greedy evaluation ($\epsilon = 0.0$) of both configurations and the rule-based policy over the 20 benchmark episodes:
+### Evaluate Policy & Load Checkpoint
 ```bash
 PYTHONPATH=src python src/dqn/evaluate_dqn.py
 ```
-This generates comparison tables in the terminal, saves metrics CSV logs, and copies the best-performing model to `models/selected_dqn.pt`.
+*Evaluates both DQN configurations and the rule-based baseline greedily ($\epsilon=0.0$) over 20 benchmark episodes, prints evaluation comparison tables, and saves the best model to `models/selected_dqn.pt`.*
 
-### 3. Rendering and Recording Video
-To visually demonstrate the trained DQN policy:
-* **macOS (Mac M1/M2/M3):**
+### Render Policy in 3D MuJoCo Viewer
+* **macOS (Apple Silicon M1/M2/M3)**:
   ```bash
+  # Step-by-step evaluation renderer (as recommended in assignment specifications):
+  PYTHONPATH=src mjpython src/dqn/render_dqn_policy.py
+
+  # Optional continuous back-and-forth swing demo:
   PYTHONPATH=src mjpython src/dqn/render_dqn_continuous.py
   ```
-* **Linux / WSL:**
+* **Linux / Windows WSL**:
   ```bash
-  PYTHONPATH=src python src/dqn/render_dqn_continuous.py
+  PYTHONPATH=src python src/dqn/render_dqn_policy.py
   ```
-*(When the window opens, the robot will automatically alternate between goal targets in 3D MuJoCo).*
+
+---
+
+## 4. Student-Written DQN Implementation Details
+
+The DQN implementation is located in `src/dqn/`:
+* **`q_network.py` (`QNetwork`)**: PyTorch `nn.Module` with 4 inputs ($[\theta, \dot{\theta}, g, g - \theta]$), two hidden layers of 64 units with ReLU activations, Kaiming Normal weight initialization, and 3 unconstrained linear outputs corresponding to actions (Decrease, Hold, Increase target).
+* **`replay_buffer.py` (`ReplayBuffer`)**: 50,000 capacity circular transition memory using `collections.deque`, sampling mini-batches of size 64 as PyTorch tensors on the active device.
+* **`agent.py` (`DQNAgent`)**: Online and Target Q-networks with hard updates every 250 optimization steps, Huber loss (Smooth L1), gradient clipping at 1.0, $\epsilon$-greedy action selection, and checkpoint saving/loading.
+* **`train_dqn.py`**: Headless training script recording rewards, success rates, loss, and epsilon decay over 600 episodes.
+* **`evaluate_dqn.py`**: Benchmark evaluation script running 20 episodes with $\epsilon=0.0$ across goals `-0.8, -0.4, +0.4, +0.8` rad.
+
+---
+
+## 5. Major Repository Files Overview
+
+```text
+├── README.md                          # Main project documentation & execution guide
+├── SUBMISSION_INFO.md                 # One-page portal submission reference
+├── MAC_M1_RUN_GUIDE.md                # Native macOS execution notes
+├── requirements.txt                   # Dependency list (torch, gymnasium, mujoco, numpy, etc.)
+├── .gitignore                         # Git exclusion rules per Section 16.5
+├── Unitree_MuJoCo_G1_Primer_Workshop.ipynb # Completed assignment Jupyter Notebook
+├── models/                            # Saved PyTorch model checkpoints
+│   ├── dqn_config_a.pt                # Trained weights for Config A (decay=0.995)
+│   ├── dqn_config_b.pt                # Trained weights for Config B (decay=0.985)
+│   └── selected_dqn.pt                # Best model checkpoint for evaluation
+├── report/                            # Technical report documentation
+│   ├── DQN_Assignment_Report.md       # 13-section Academic Technical Report
+│   └── DQN_Assignment_Report.pdf      # PDF version of technical report
+├── results/                           # Evaluation CSVs and training visualization plots
+│   ├── config_a/                      # Training plots and metrics for Config A
+│   ├── config_b/                      # Training plots and metrics for Config B
+│   ├── epsilon_decay_reward_comparison.png
+│   ├── epsilon_decay_success_comparison.png
+│   ├── evaluation_success_by_angle.png
+│   └── rule_based_evaluation_metrics.csv
+└── src/
+    ├── g1_rl/                         # Gymnasium environment wrapper
+    │   └── g1_elbow_env.py
+    └── dqn/                           # Student-written PyTorch DQN implementation
+        ├── __init__.py
+        ├── q_network.py
+        ├── replay_buffer.py
+        ├── agent.py
+        ├── train_dqn.py
+        ├── evaluate_dqn.py
+        ├── render_dqn_policy.py
+        ├── render_dqn_continuous.py
+        └── smoke_test.py
+```

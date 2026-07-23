@@ -1,3 +1,7 @@
+torch
 gymnasium==1.3.0
-mujoco==3.10.0
 numpy==2.5.1
+pandas
+matplotlib
+jupyter
+mujoco==3.10.0
