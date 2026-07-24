@@ -8,6 +8,7 @@
 **Institution:** Conestoga College, Ontario, Canada  
 **GitHub Repository URL:** [https://github.com/alicih4n/CSCN8020_Assignment3](https://github.com/alicih4n/CSCN8020_Assignment3)  
 **Cloneable .git URL:** `https://github.com/alicih4n/CSCN8020_Assignment3.git`  
+**YouTube Video Demonstration:** [https://www.youtube.com/watch?v=KJPv8v0fPEY](https://www.youtube.com/watch?v=KJPv8v0fPEY)  
 **Operating Environment:** macOS (Apple Silicon M1) | Python 3.13 | PyTorch 2.10.0 with MPS GPU acceleration
 
 ---
