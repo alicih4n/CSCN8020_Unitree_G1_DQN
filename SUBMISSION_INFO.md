@@ -6,8 +6,7 @@
 **Assignment Title:** Deep Q-Network (DQN) Control of the Unitree G1 Left Elbow  
 **Instructor:** Prof. Enrique Espinosa  
 **Institution:** Conestoga College, Ontario, Canada  
-**GitHub Repository URL:** [https://github.com/alicih4n/CSCN8020_Assignment3](https://github.com/alicih4n/CSCN8020_Assignment3)  
-**Cloneable .git URL:** `https://github.com/alicih4n/CSCN8020_Assignment3.git`
+**GitHub Repository:** [https://github.com/alicih4n/CSCN8020_Assignment3.git](https://github.com/alicih4n/CSCN8020_Assignment3.git)
 
 ---
 
